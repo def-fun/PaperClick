@@ -2774,11 +2774,14 @@
     let input = document.getElementById('input');
     let output = document.getElementById('output');
     let info = document.getElementById('info');
+    let citesCount = 0;
+    let blankCount, spaceCount = 0;
 
     function replaceChars() {
-        if (/[\d\]]$/.test(input.value)) {
-            input.value += ' ';
-        }
+        citesCount = 0;
+        blankCount = 0;
+        spaceCount = 0;
+
         let new_node = input.cloneNode(true);
         $('#selectPanel').find('input:checked').each(function (i, e) {
             console.log(i, e)
@@ -2786,15 +2789,14 @@
             new_node.querySelectorAll('[_attr_mark_="' + _attr_mark_ + '"]').forEach(function (ele) {
                 console.log(ele)
                 ele.remove()
+                citesCount += 1;
             })
         })
-         console.log(new_node)
+        console.log(new_node)
 
-        let citesCount = 0;
-        let blankCount, spaceCount = 0;
-        let tmpText = new_node.textContent.replace(new RegExp('\n', ("gm")), ' '); //把所有\n换成空格
+        let tmpText = new_node.innerText.replace(new RegExp('\n', ("gm")), ' '); //把所有\n换成空格
         try {
-            blankCount = input.value.match(/\n/ig).length;
+            blankCount = input.innerText.match(/\n/ig).length;
         } catch (e) {
             blankCount = 0
         }
@@ -2803,12 +2805,13 @@
             tmpText = tmpText.replace(new RegExp('\t', ("gm")), ' ');  //把所有tab换成空格
             tmpText = tmpText.replace(new RegExp(/\s+/g), ' ');  //把多个空格替换为单个空格
             try {
-                spaceCount = input.value.match(/\s{2,}/ig).length;
+                spaceCount = new_node.innerText.match(/\s{2,}/ig).length;
             } catch (e) {
                 spaceCount = 0
             }
             info.innerHTML += '，多余空格<span class="num">' + spaceCount + '</span>处';
         }
+        info.innerHTML += '，引文<span class="num">' + citesCount + '</span>处';
 
         tmpText = tmpText.replace(/(^\s*)|(\s*$)/g, ""); // 删除首尾空白字符
         output.value = tmpText;
@@ -2825,7 +2828,7 @@
 
     function clearText() { //清空输入框和输出框的内容
         console.log('clear');
-        input.value = '';
+        input.innerHTML = '';
         output.value = '';
         info.innerHTML = '';
     }
@@ -2869,9 +2872,9 @@
         return elementsCount;
     }
 
-    function highlightElementByAttr(_attr_mark_) {//通过attr_mark筛选元素并且高亮
+    function highlightElementByAttr(_attr_mark_) {//通过_attr_mark_筛选元素并且高亮
         let e = $('[_attr_mark_="' + _attr_mark_ + '"]')
-        console.log(e)
+        // console.log(e)
         e.css("background-color", "#ff0000")
     }
 
