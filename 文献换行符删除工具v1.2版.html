@@ -7,19 +7,26 @@
     <style>
         .rightArea {
             float: left;
-            width: 400px;
+            width: 35%;
             height: 400px;
         }
 
         .leftArea {
             float: left;
-            width: 400px;
+            width: 35%;
             height: 400px;
             background-color: #f8f9fa
         }
 
+        .middleArea {
+            float: left;
+            width: 20%;
+            height: 400px;
+            background-color: #d6d7d9
+        }
+
         #input {
-            width: 400px;
+            width: 100%;
             height: 400px;
             box-sizing: border-box; /* For IE and modern versions of Chrome */
             -moz-box-sizing: border-box; /* For Firefox                          */
@@ -2727,6 +2734,11 @@
 
 
 </div>
+<div class="middleArea">
+
+    <div id="selectPanel" style="background: #f8b9bb;"></div>
+
+</div>
 <div class="rightArea">
     <label>
             <textarea class="output" readonly id="output" onclick="replaceChars()"
@@ -2767,9 +2779,20 @@
         if (/[\d\]]$/.test(input.value)) {
             input.value += ' ';
         }
+        let new_node = input.cloneNode(true);
+        $('#selectPanel').find('input:checked').each(function (i, e) {
+            console.log(i, e)
+            let _attr_mark_ = e.value
+            new_node.querySelectorAll('[_attr_mark_="' + _attr_mark_ + '"]').forEach(function (ele) {
+                console.log(ele)
+                ele.remove()
+            })
+        })
+         console.log(new_node)
+
         let citesCount = 0;
         let blankCount, spaceCount = 0;
-        let tmpText = input.value.replace(new RegExp('\n', ("gm")), ' ');
+        let tmpText = new_node.textContent.replace(new RegExp('\n', ("gm")), ' '); //把所有\n换成空格
         try {
             blankCount = input.value.match(/\n/ig).length;
         } catch (e) {
@@ -2777,8 +2800,8 @@
         }
         info.innerHTML = '删除换行 <span class="num">' + blankCount + '</span> 个';
         if (document.getElementById("deleteSpace").checked) { // 删除多余空格
-            tmpText = tmpText.replace(new RegExp('\t', ("gm")), ' ');
-            tmpText = tmpText.replace(new RegExp(/\s+/g), ' ');
+            tmpText = tmpText.replace(new RegExp('\t', ("gm")), ' ');  //把所有tab换成空格
+            tmpText = tmpText.replace(new RegExp(/\s+/g), ' ');  //把多个空格替换为单个空格
             try {
                 spaceCount = input.value.match(/\s{2,}/ig).length;
             } catch (e) {
@@ -2787,70 +2810,6 @@
             info.innerHTML += '，多余空格<span class="num">' + spaceCount + '</span>处';
         }
 
-        if (document.getElementById("deleteCites1").checked) { // 删除引文编号
-            // {标点符号}{带或不带,-的数字}{空格}即判断为引文编号
-            let wordsCount;
-            try {
-                wordsCount = input.value.match(/ /ig).length;
-            } catch (e) {
-                wordsCount = 0;
-            }
-            $('#input').highlightWithinTextarea({
-                highlight: [
-                    {highlight: /(?<=[^\d]\.)\d+\s/gi, className: 'red'},
-                    {highlight: /(?<=[^\d]\.)\d+[,-]\d+\s/gi, className: 'red'},
-                    {highlight: /(?<=[a-z][,.])\d+\s/gi, className: 'red'},
-                    {highlight: /(?<=[a-z][,.])\d+[,-]\d+\s/gi, className: 'red'},
-                ]
-            });
-            let tmpText2 = tmpText;
-            let regx = [
-                [/(?<=[^\d]\.)\d+\s/, ' '], // the value is 3.14
-                [/(?<=[^\d]\.)\d+[,-]\d+\s/, ' '],
-                [/(?<=[a-z][,.])\d+\s/, ' '], // apple,2 banana,3 pear,4
-                [/(?<=[a-z][,.])\d+[,-]\d+\s/, ' '], // apple, banana and pear.2-4
-            ]
-            for (let i = 0; i < wordsCount; i++) {
-                for (let r = 0; r < regx.length; r++) {
-                    tmpText = tmpText.replace(regx[r][0], regx[r][1])
-                    if (tmpText !== tmpText2) {
-                        citesCount += 1;
-                        tmpText2 = tmpText;
-                    }
-                }
-            }
-            info.innerHTML += '，引文编号<span class="num">' + citesCount + '</span>个';
-        }
-
-        if (document.getElementById("deleteCites2").checked) { // 删除引文编号
-            // [数字]{空格}即判断为引文编号
-            let wordsCount;
-            try {
-                wordsCount = input.value.match(/ /ig).length;
-            } catch (e) {
-                wordsCount = 0;
-            }
-            $('#input').highlightWithinTextarea({
-                highlight: [{highlight: /\[\d+]/gi, className: 'blue'},
-                    {highlight: /\[\d+[,–-]\d+]/gi, className: 'blue'},
-                ],
-            });
-            let tmpText2 = tmpText;
-            let regx = [
-                [/\[\d+]/, ''],
-                [/\[\d+[,–]\d+]/, ''],
-            ]
-            for (let i = 0; i < wordsCount; i++) {
-                for (let r = 0; r < regx.length; r++) {
-                    tmpText = tmpText.replace(regx[r][0], regx[r][1])
-                    if (tmpText !== tmpText2) {
-                        citesCount += 1;
-                        tmpText2 = tmpText;
-                    }
-                }
-            }
-            info.innerHTML += '，引文编号<span class="num">' + citesCount + '</span>个';
-        }
         tmpText = tmpText.replace(/(^\s*)|(\s*$)/g, ""); // 删除首尾空白字符
         output.value = tmpText;
         output.select();
@@ -2871,9 +2830,14 @@
         info.innerHTML = '';
     }
 
+    let elementList = [] //样式列表
+    let elementsCount = {} //统计各种样式的个数
+    let elementMark = [] //保存样式状态
+
     function setAttrByStyle() { //根据tagName、className、style进行分类，并且添加名为`_attr_mark_`的自定义属性
-        let elementsCount = {}
-        let elementList = []
+        elementsCount = {}
+        elementList = []
+        $('#selectPanel').empty()
         $('#input *').each(function (i, e) {
             // console.log(i, e)
             if (e.tagName.toUpperCase() === 'BR') {
@@ -2888,6 +2852,19 @@
             }
             e.setAttribute('_attr_mark_', elementList.indexOf(k))
         })
+        for (let i = 0; i < elementList.length; i++) {
+            //let chk = '<label><input value="' + i + '" type="checkbox" class="cite"/>' + elementList[i] + '</label><br>'
+            let input1 = $('<input type="checkbox">')
+            input1.attr({value: i, title: elementList[i]})
+            console.log(elementList[i])
+            let label1 = $('<label></label>')
+            label1.append(input1[0].outerHTML + elementList[i] + '<br>')
+            label1.attr({
+                'onmouseover': 'highlightLableElement(this)',
+                'onmouseout': 'cancelHighlightLableElement(this)'
+            })
+            $('#selectPanel').append(label1[0].outerHTML)
+        }
 
         return elementsCount;
     }
@@ -2897,6 +2874,25 @@
         console.log(e)
         e.css("background-color", "#ff0000")
     }
+
+    function highlightLableElement(obj) {//传入label的this对象，高亮对应_attr_mark_的文本
+        // console.log(obj)
+        let input = obj.getElementsByTagName('input')[0]
+        let e = $('[_attr_mark_="' + input.value + '"]')
+        e.css("background-color", "#ff0000")
+    }
+
+    function cancelHighlightLableElement(obj) {//传入label的this对象，取消高亮
+        console.log(obj)
+        let input = obj.getElementsByTagName('input')[0]
+        if (!input.checked) {
+            let _attr_mark_ = input.value
+            let e = $('[_attr_mark_="' + _attr_mark_ + '"]')
+            e.attr("style", elementList[_attr_mark_].split('|')[2])
+        }
+
+    }
+
 </script>
 <script>
     // 纯数字引用和带方括号的引用，只能选择1个
@@ -2909,5 +2905,10 @@
         })
         replaceChars();
     });
+
+    document.getElementById("input").addEventListener("input", inputEvt => {
+        console.log("input event fired");
+        setAttrByStyle()
+    }, false);
 </script>
 </html>
