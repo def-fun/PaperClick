@@ -2853,13 +2853,13 @@
             } else {
                 elementsCount[k] += 1
             }
-            e.setAttribute('_attr_mark_', elementList.indexOf(k))
+            e.setAttribute('_attr_mark_', k)
         })
         for (let i = 0; i < elementList.length; i++) {
             //let chk = '<label><input value="' + i + '" type="checkbox" class="cite"/>' + elementList[i] + '</label><br>'
             let input1 = $('<input type="checkbox">')
-            input1.attr({value: i, title: elementList[i]})
-            console.log(elementList[i])
+            input1.attr({value: elementList[i], title: elementList[i]})
+            // console.log(elementList[i])
             let label1 = $('<label></label>')
             label1.append(input1[0].outerHTML + elementList[i] + '<br>')
             label1.attr({
@@ -2874,24 +2874,27 @@
 
     function highlightElementByAttr(_attr_mark_) {//通过_attr_mark_筛选元素并且高亮
         let e = $('[_attr_mark_="' + _attr_mark_ + '"]')
-        // console.log(e)
+        // console.log('highlightElementByAttr', e)
         e.css("background-color", "#ff0000")
     }
 
     function highlightLableElement(obj) {//传入label的this对象，高亮对应_attr_mark_的文本
-        // console.log(obj)
+        // console.log('highlightLableElement(obj)', obj)
         let input = obj.getElementsByTagName('input')[0]
+        // console.log('input', input)
         let e = $('[_attr_mark_="' + input.value + '"]')
+        // console.log('e',e)
         e.css("background-color", "#ff0000")
     }
 
     function cancelHighlightLableElement(obj) {//传入label的this对象，取消高亮
-        console.log(obj)
+        // console.log('cancelHighlightLableElement', obj)
         let input = obj.getElementsByTagName('input')[0]
         if (!input.checked) {
             let _attr_mark_ = input.value
             let e = $('[_attr_mark_="' + _attr_mark_ + '"]')
-            e.attr("style", elementList[_attr_mark_].split('|')[2])
+            // console.log(_attr_mark_,e)
+            e.attr("style", _attr_mark_.split('|')[2])
         }
 
     }
