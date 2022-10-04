@@ -9,7 +9,7 @@ PaperClick
 ## 背景
 
 看英文文献的时候，有时需要把pdf里的一句或者一段话复制到有道、google翻译、百度翻译这些软件里翻译，如果复制出来的文本有制表符(Tab)、换行(\r和\n)
-或者数字引文，那翻译结果往往就不正常。还有时候需要把文字复制出来到word做笔记啥的，都要手动删除这些符号，效率低，容易有遗漏。典型的例子如下：
+或者数字引文（图片原文里的`1-3`,`4`,`5`），那翻译结果往往就不正常。还有时候需要把文字复制出来到word做笔记啥的，都要手动删除这些符号，效率低，容易有遗漏。典型的例子如下：
 
 ```text
 The chemical synthesis of biomolecules such as peptides,1−3
@@ -35,18 +35,21 @@ biology and material sciences.
 + [四行代码去除复制PDF文字段落时多余的换行符](https://blog.csdn.net/weixin_43439761/article/details/126859966)
 + [自动删除pdf复制文本中的换行符](https://blog.csdn.net/qq_37645194/article/details/113854690)
 + [一键去除pdf复制并翻译时的大量换行符](https://zhuanlan.zhihu.com/p/461853895)
++ [Python简单实现消除“PDF格式”论文中的换行符](https://dandelioncloud.cn/article/details/1443343836868345857)
++ [解决翻译论文时出现的换行问题-网页翻译-谷歌插件-翻译助手](https://www.freesion.com/article/25351147379/)
 
 还有利用浏览器地址栏来自动替换换行符的
 
 + [去掉PDF内容的换行符](https://blog.csdn.net/tiao_god/article/details/124396947)
 
-不想编程的话，word也行
+不想编程的话，word、IDE也行
 
 + [PDF复制文字到Word出现空格、换行符，如何批量删除？](https://zhuanlan.zhihu.com/p/536367727)
++ [PDF内复制文字多余换行问题](https://blog.csdn.net/qq_25327609/article/details/89948593)
 
 如果是我自己用，这些都行，但是对不喜欢捣鼓的人有点难度，比如python要装开发环境和第三方库、油猴要装插件、word要记通配符。
 
-感觉网页来的方便，跨平台、通用、可离线、不会失效，使用者下载一个html，保存好，用的时候打开就行，还自带说明书，于是就有了这个项目。
+感觉网页来的方便，跨平台、通用、可离线、不会失效，使用者下载一个html，保存好，用的时候打开就行，自带说明书。此外，还需要自动删除引文编号，于是就有了这个项目。
 
 ## Feature
 
@@ -131,3 +134,9 @@ TEA.4
 ```
 
 > https://onlinelibrary.wiley.com/doi/abs/10.1002/047084289X.rt217
+
+## 其他参考链接
+
+- [把文字从PDF里复制word, 怎么有效消除每行末尾的换行空格？](https://www.zhihu.com/question/41122422/answer/2408149797)
+- [pdf转为word后去除多余的换行](https://wenku.baidu.com/view/cf8c054001768e9951e79b89680203d8ce2f6ae5.html)
+- [Line Break Removal Tool](https://www.textfixer.com/tools/remove-line-breaks.php)
