@@ -2777,6 +2777,7 @@
     let citesCount = 0;
     let blankCount, spaceCount = 0;
 
+
     function replaceChars() {
         citesCount = 0;
         blankCount = 0;
@@ -2835,7 +2836,11 @@
 
     let elementList = [] //样式列表
     let elementsCount = {} //统计各种样式的个数
-    let elementMark = [] //保存样式状态
+    // let elementStat = {} //保存样式状态,key为_attr_mark_，value为bool
+    let elementStat = localStorage.getItem("elementStat")
+    if (elementStat === null) {
+        elementStat = {}
+    }
 
     function setAttrByStyle() { //根据tagName、className、style进行分类，并且添加名为`_attr_mark_`的自定义属性
         elementsCount = {}
@@ -2858,17 +2863,25 @@
         for (let i = 0; i < elementList.length; i++) {
             //let chk = '<label><input value="' + i + '" type="checkbox" class="cite"/>' + elementList[i] + '</label><br>'
             let input1 = $('<input type="checkbox">')
-            input1.attr({value: elementList[i], title: elementList[i]})
-            // console.log(elementList[i])
+            let _attr_mark_ = elementList[i]
+            input1.attr({value: _attr_mark_, '_attr_mark_': true})
+            // console.log(_attr_mark_)
             let label1 = $('<label></label>')
-            label1.append(input1[0].outerHTML + elementList[i] + '<br>')
+            label1.append(input1[0].outerHTML + _attr_mark_ + '<br>')
             label1.attr({
                 'onmouseover': 'highlightLableElement(this)',
                 'onmouseout': 'cancelHighlightLableElement(this)'
             })
             $('#selectPanel').append(label1[0].outerHTML)
+            var val = localStorage.getItem(_attr_mark_);  //获取存储的元素
+            console.log('val', val)
+            if (val === 'checked') {
+                $('input[value="' + _attr_mark_ + '"]').prop('checked', true)
+            } else if (val === 'unchecked') {
+                $('input[value="' + _attr_mark_ + '"]').prop('checked', false)
+            }
         }
-
+        sync_element_stat()
         return elementsCount;
     }
 
@@ -2885,18 +2898,30 @@
         let e = $('[_attr_mark_="' + input.value + '"]')
         // console.log('e',e)
         e.css("background-color", "#ff0000")
+
     }
 
     function cancelHighlightLableElement(obj) {//传入label的this对象，取消高亮
         // console.log('cancelHighlightLableElement', obj)
         let input = obj.getElementsByTagName('input')[0]
+        let _attr_mark_ = input.value
         if (!input.checked) {
-            let _attr_mark_ = input.value
             let e = $('[_attr_mark_="' + _attr_mark_ + '"]')
             // console.log(_attr_mark_,e)
             e.attr("style", _attr_mark_.split('|')[2])
+            localStorage.setItem(_attr_mark_, 'unchecked')
+        } else {
+            localStorage.setItem(_attr_mark_, 'checked')
         }
+    }
 
+    function sync_element_stat() {
+        $('input[_attr_mark_=true]').each(function (i, e) {
+            if(localStorage.getItem(e.value) === 'checked'){
+                 let e2 = $('[_attr_mark_="' + e.value + '"]')
+                e2.css("background-color", "#ff0000")
+            }
+        })
     }
 
 </script>
